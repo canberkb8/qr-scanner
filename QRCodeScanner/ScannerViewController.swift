@@ -115,7 +115,11 @@ class ScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDel
     }
 
     func found(code: String) {
-        print("QR result : ", code)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            self.alertDialog(title: "QR result", message: code) {
+                self.navigationController?.popViewController(animated: true)
+            }
+        }
     }
 
     override var prefersStatusBarHidden: Bool {
@@ -151,6 +155,19 @@ extension UIViewController {
 
     public var screenHeight: CGFloat {
         return UIScreen.main.bounds.height
+    }
+
+    func alertDialog(title: String, message: String, ok: @escaping () -> Void = { }) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+            switch action.style {
+            case .default: ok()
+            case .cancel: break
+            case .destructive: break
+            @unknown default: fatalError()
+            }
+        }))
+        present(alert, animated: true, completion: nil)
     }
 
 }
